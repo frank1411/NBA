@@ -46,7 +46,16 @@ function App() {
   };
 
   const handleFactorChange = (factor, value) => {
-    const newFactors = { ...gameFactors, [factor]: value };
+    const newFactors = { ...gameFactors };
+    newFactors[factor] = value;
+
+    // Sincronización Back-to-Back y días de descanso
+    if (factor === 'isBackToBack' && value === true) {
+      newFactors.restDays = 0;
+    } else if (factor === 'isBackToBack' && value === false && newFactors.restDays === 0) {
+      newFactors.restDays = 1;
+    }
+
     setGameFactors(newFactors);
   };
 
