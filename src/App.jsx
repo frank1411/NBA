@@ -73,8 +73,15 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">Predictor de Puntuación NBA</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Predictor de Puntuación NBA</h1>
         
+        {prediction !== null && (
+          <div className="mb-6 p-4 bg-green-50 rounded-lg">
+            <h2 className="text-lg font-semibold mb-2">Predicción próximo juego:</h2>
+            <p className="text-3xl font-bold text-green-600">{prediction} puntos</p>
+          </div>
+        )}
+
         <FileUploader onFileLoad={handleFileLoad} />
 
         <form onSubmit={handleAddScore} className="mb-6">
@@ -135,6 +142,20 @@ function App() {
 
             <div className="space-y-2">
               <label className="block text-sm">
+                Ritmo de Juego del Rival (95-105):
+                <input
+                  type="number"
+                  value={gameFactors.rivalPace}
+                  onChange={(e) => handleFactorChange('rivalPace', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="95"
+                  max="105"
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm">
                 Jugadores Clave Lesionados:
                 <input
                   type="number"
@@ -153,13 +174,6 @@ function App() {
             />
           </div>
         </form>
-
-        {prediction !== null && (
-          <div className="mb-6 p-4 bg-green-50 rounded-lg">
-            <h2 className="text-lg font-semibold mb-2">Predicción próximo juego:</h2>
-            <p className="text-3xl font-bold text-green-600">{prediction} puntos</p>
-          </div>
-        )}
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Historial de puntuaciones:</h2>
