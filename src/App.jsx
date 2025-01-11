@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { NBAScorePredictor } from './utils/scorePredictor';
 import { FileUploader } from './components/FileUploader';
-import { EnvironmentalFactors } from './components/EnvironmentalFactors';
 import { validateScores } from './utils/fileHelpers';
 
 const predictorTeam1 = new NBAScorePredictor(5);
 const predictorTeam2 = new NBAScorePredictor(5);
 
-function TeamPredictor({ predictor, defaultName }) {
+function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChange }) {
   const [teamName, setTeamName] = useState(defaultName);
   const [score, setScore] = useState('');
   const [prediction, setPrediction] = useState(null);
@@ -50,6 +49,19 @@ function TeamPredictor({ predictor, defaultName }) {
 
   const handleFactorChange = (factor, value) => {
     const newFactors = { ...gameFactors, [factor]: value };
+    
+    // Si se marca como local, notificar al otro equipo
+    if (factor === 'isHome') {
+      onFactorChange('isHome', value);
+    }
+    
+    // Si se marca back-to-back, establecer días de descanso en 0
+    if (factor === 'isBackToBack' && value === true) {
+      newFactors.restDays = 0;
+    } else if (factor === 'isBackToBack' && value === false) {
+      newFactors.restDays = 1;
+    }
+    
     setGameFactors(newFactors);
   };
 
@@ -123,7 +135,7 @@ function TeamPredictor({ predictor, defaultName }) {
             </label>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm">
                 Rating Defensivo Rival (85-115):
@@ -151,7 +163,9 @@ function TeamPredictor({ predictor, defaultName }) {
                 />
               </label>
             </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm">
                 Jugadores Clave Lesionados:
@@ -165,12 +179,66 @@ function TeamPredictor({ predictor, defaultName }) {
                 />
               </label>
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm">
+                Días de Descanso:
+                <input
+                  type="number"
+                  value={gameFactors.restDays}
+                  onChange={(e) => handleFactorChange('restDays', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="0"
+                  max="7"
+                  disabled={gameFactors.isBackToBack}
+                />
+              </label>
+            </div>
           </div>
 
-          <EnvironmentalFactors 
-            factors={gameFactors} 
-            onChange={handleFactorChange} 
-          />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm">
+                Altitud (metros):
+                <input
+                  type="number"
+                  value={gameFactors.altitude}
+                  onChange={(e) => handleFactorChange('altitude', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="0"
+                  max="2000"
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm">
+                Distancia de Viaje (km):
+                <input
+                  type="number"
+                  value={gameFactors.travelDistance}
+                  onChange={(e) => handleFactorChange('travelDistance', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="0"
+                  max="5000"
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm">
+                Cambio de Zona Horaria:
+                <input
+                  type="number"
+                  value={gameFactors.timeZoneChange}
+                  onChange={(e) => handleFactorChange('timeZoneChange', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="-3"
+                  max="3"
+                />
+              </label>
+            </div>
+          </div>
         </div>
       </form>
 
@@ -199,12 +267,31 @@ function TeamPredictor({ predictor, defaultName }) {
 }
 
 function App() {
+  const [team1Factors, setTeam1Factors] = useState({
+    isHome: false,
+    isBackToBack: false
+  });
+  const [team2Factors, setTeam2Factors] = useState({
+    isHome: false,
+    isBackToBack: false
+  });
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <h1 className="text-3xl font-bold text-center mb-8">Predictor de Puntuación NBA</h1>
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        <TeamPredictor predictor={predictorTeam1} defaultName="Equipo Local" />
-        <TeamPredictor predictor={predictorTeam2} defaultName="Equipo Visitante" />
+        <TeamPredictor 
+          predictor={predictorTeam1} 
+          defaultName="Equipo Local" 
+          otherTeamFactors={team2Factors}
+          onFactorChange={(factor, value) => setTeam2Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
+        />
+        <TeamPredictor 
+          predictor={predictorTeam2} 
+          defaultName="Equipo Visitante" 
+          otherTeamFactors={team1Factors}
+          onFactorChange={(factor, value) => setTeam1Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
+        />
       </div>
     </div>
   );
