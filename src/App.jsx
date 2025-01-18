@@ -62,6 +62,11 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
       newFactors.restDays = 1;
     }
     
+    // Si los días de descanso se establecen en 0, marcar automáticamente Back-to-Back
+    if (factor === 'restDays' && value === 0) {
+      newFactors.isBackToBack = true;
+    }
+    
     setGameFactors(newFactors);
   };
 
