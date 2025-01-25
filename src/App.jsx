@@ -116,32 +116,66 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={gameFactors.isHome}
-                onChange={(e) => handleFactorChange('isHome', e.target.checked)}
-                className="mr-2"
-              />
-              Local
-            </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Local y Back to Back</h3>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={gameFactors.isHome}
+                  onChange={(e) => handleFactorChange('isHome', e.target.checked)}
+                  className="mr-2"
+                />
+                Local
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={gameFactors.isBackToBack}
+                  onChange={(e) => handleFactorChange('isBackToBack', e.target.checked)}
+                  className="mr-2"
+                />
+                Back-to-Back
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Días de Descanso</span>
+                <input
+                  type="number"
+                  value={gameFactors.restDays}
+                  onChange={(e) => handleFactorChange('restDays', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="0"
+                  max="7"
+                  disabled={gameFactors.isBackToBack}
+                />
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Jugadores Lesionados</span>
+                <input
+                  type="number"
+                  value={gameFactors.injuredPlayers}
+                  onChange={(e) => handleFactorChange('injuredPlayers', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  min="0"
+                  max="5"
+                />
+              </label>
+            </div>
 
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={gameFactors.isBackToBack}
-                onChange={(e) => handleFactorChange('isBackToBack', e.target.checked)}
-                className="mr-2"
-              />
-              Back-to-Back
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Rating Defensivo Rival (85-115):
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Métricas de Rendimiento</h3>
+              <label className="block">
+                <span className="text-gray-700">Net Rating</span>
+                <input
+                  type="number"
+                  value={gameFactors.netRating}
+                  onChange={(e) => handleFactorChange('netRating', Number(e.target.value))}
+                  className="w-full p-2 border rounded mt-1"
+                  step="0.1"
+                />
+              </label>
+              <label className="block">
+                <span className="text-gray-700">Rating Defensivo Rival</span>
                 <input
                   type="number"
                   value={gameFactors.rivalDefensiveRating}
@@ -151,11 +185,8 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
                   max="115"
                 />
               </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Ritmo de Juego del Rival (95-105):
+              <label className="block">
+                <span className="text-gray-700">Ritmo de Juego del Rival</span>
                 <input
                   type="number"
                   value={gameFactors.rivalPace}
@@ -168,70 +199,22 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Jugadores Clave Lesionados:
+          <div className="space-y-4 md:col-span-2">
+            <h3 className="text-lg font-semibold">Otros Datos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label className="block">
+                <span className="text-gray-700">Altitud</span>
                 <input
                   type="number"
-                  value={gameFactors.injuredPlayers}
-                  onChange={(e) => handleFactorChange('injuredPlayers', Number(e.target.value))}
+                  value={gameFactors.altitude}
+                  onChange={(e) => handleFactorChange('altitude', Number(e.target.value))}
                   className="w-full p-2 border rounded mt-1"
                   min="0"
-                  max="5"
+                  max="2000"
                 />
               </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Días de Descanso:
-                <input
-                  type="number"
-                  value={gameFactors.restDays}
-                  onChange={(e) => handleFactorChange('restDays', Number(e.target.value))}
-                  className="w-full p-2 border rounded mt-1"
-                  min="0"
-                  max="7"
-                  disabled={gameFactors.isBackToBack}
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Net Rating (-15 a +15):
-                <input
-                  type="number"
-                  value={gameFactors.netRating}
-                  onChange={(e) => handleFactorChange('netRating', Number(e.target.value))}
-                  className="w-full p-2 border rounded mt-1"
-                  min="-15"
-                  max="15"
-                />
-              </label>
-            </div>
-            <div className="space-y-2">
-            <label className="block text-sm">
-              Altitud (metros):
-              <input
-                type="number"
-                value={gameFactors.altitude}
-                onChange={(e) => handleFactorChange('altitude', Number(e.target.value))}
-                className="w-full p-2 border rounded mt-1"
-                min="0"
-                max="2000"
-              />
-            </label>
-          </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Distancia de Viaje (km):
+              <label className="block">
+                <span className="text-gray-700">Distancia de Viaje</span>
                 <input
                   type="number"
                   value={gameFactors.travelDistance}
@@ -241,11 +224,8 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
                   max="5000"
                 />
               </label>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm">
-                Cambio de Zona Horaria:
+              <label className="block">
+                <span className="text-gray-700">Cambio de Zona Horaria</span>
                 <input
                   type="number"
                   value={gameFactors.timeZoneChange}
