@@ -49,7 +49,7 @@ export function EnvironmentalFactors({ factors, onChange }) {
 
       <div className="space-y-2">
         <label className="block text-sm">
-          Cambio de Zona Horaria:
+          Cambio de Huso:
           <input
             type="number"
             value={factors.timeZoneChange}

@@ -225,7 +225,7 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
                 />
               </label>
               <label className="block">
-                <span className="text-gray-700">Cambio de Zona Horaria</span>
+                <span className="text-gray-700">Cambio de Huso</span>
                 <input
                   type="number"
                   value={gameFactors.timeZoneChange}
