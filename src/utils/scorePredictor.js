@@ -17,6 +17,7 @@ export class NBAScorePredictor {
       altitude: factors.altitude || 0,
       travelDistance: factors.travelDistance || 0,
       timeZoneChange: factors.timeZoneChange || 0,
+      netRating: factors.netRating || 0, // Nuevo factor: Net Rating
       date: new Date()
     };
 
@@ -36,7 +37,7 @@ export class NBAScorePredictor {
     if (this.scoresHistory.length < this.windowSize) {
       return null;
     }
-    
+
     const recentScores = this.scoresHistory.slice(-this.windowSize);
     const baselinePrediction = recentScores.reduce((a, b) => a + b.score, 0) / this.windowSize;
 
@@ -54,11 +55,9 @@ export class NBAScorePredictor {
     adjustedPrediction -= (nextGameFactors.injuredPlayers || 0) * 3;
 
     const avgDefensiveRating = 100;
-    // Corregido: Ahora un rating defensivo más alto resulta en más puntos
     const defensiveImpact = ((nextGameFactors.rivalDefensiveRating || avgDefensiveRating) - avgDefensiveRating) * 0.5;
     adjustedPrediction += defensiveImpact;
 
-    // Nuevos factores
     // Días de descanso
     const restDays = nextGameFactors.restDays || 1;
     if (restDays > 1) {
@@ -85,6 +84,10 @@ export class NBAScorePredictor {
     if (nextGameFactors.timeZoneChange !== 0) {
       adjustedPrediction -= Math.abs(nextGameFactors.timeZoneChange) * 0.8;
     }
+
+    // Nuevo factor: Net Rating
+    const netRatingImpact = (nextGameFactors.netRating || 0) * 0.4;
+    adjustedPrediction += netRatingImpact;
 
     return Math.max(70, Math.min(150, adjustedPrediction));
   }

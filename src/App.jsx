@@ -20,7 +20,8 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
     rivalPace: 100,
     altitude: 0,
     travelDistance: 0,
-    timeZoneChange: 0
+    timeZoneChange: 0,
+    netRating: 0, // Nuevo factor: Net Rating
   });
 
   useEffect(() => {
@@ -49,24 +50,21 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
 
   const handleFactorChange = (factor, value) => {
     const newFactors = { ...gameFactors, [factor]: value };
-    
-    // Si se marca como local, notificar al otro equipo
+
     if (factor === 'isHome') {
       onFactorChange('isHome', value);
     }
-    
-    // Si se marca back-to-back, establecer días de descanso en 0
+
     if (factor === 'isBackToBack' && value === true) {
       newFactors.restDays = 0;
     } else if (factor === 'isBackToBack' && value === false) {
       newFactors.restDays = 1;
     }
-    
-    // Si los días de descanso se establecen en 0, marcar automáticamente Back-to-Back
+
     if (factor === 'restDays' && value === 0) {
       newFactors.isBackToBack = true;
     }
-    
+
     setGameFactors(newFactors);
   };
 
@@ -201,21 +199,36 @@ function TeamPredictor({ predictor, defaultName, otherTeamFactors, onFactorChang
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm">
-                Altitud (metros):
+                Net Rating (-15 a +15):
                 <input
                   type="number"
-                  value={gameFactors.altitude}
-                  onChange={(e) => handleFactorChange('altitude', Number(e.target.value))}
+                  value={gameFactors.netRating}
+                  onChange={(e) => handleFactorChange('netRating', Number(e.target.value))}
                   className="w-full p-2 border rounded mt-1"
-                  min="0"
-                  max="2000"
+                  min="-15"
+                  max="15"
                 />
               </label>
             </div>
+            <div className="space-y-2">
+            <label className="block text-sm">
+              Altitud (metros):
+              <input
+                type="number"
+                value={gameFactors.altitude}
+                onChange={(e) => handleFactorChange('altitude', Number(e.target.value))}
+                className="w-full p-2 border rounded mt-1"
+                min="0"
+                max="2000"
+              />
+            </label>
+          </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm">
                 Distancia de Viaje (km):
