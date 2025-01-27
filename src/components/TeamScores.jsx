@@ -16,11 +16,18 @@ function TeamScores() {
 
   const [scores, setScores] = useState({});
   const [teamFolder, setTeamFolder] = useState(null);
+  const [folderPath, setFolderPath] = useState('');
 
   const selectTeamsFolder = async () => {
     try {
       const directoryHandle = await window.showDirectoryPicker();
       setTeamFolder(directoryHandle);
+      
+      // Intentar obtener la ruta legible
+      if ('getAsFileSystemHandle' in directoryHandle) {
+        const path = await directoryHandle.getAsFileSystemHandle();
+        setFolderPath(path.name);
+      }
     } catch (error) {
       console.error('Error seleccionando carpeta:', error);
       alert('Debes seleccionar una carpeta válida');
@@ -45,14 +52,19 @@ function TeamScores() {
         try {
           const fileName = `${team}_puntuaciones.txt`;
           const fileHandle = await teamFolder.getFileHandle(fileName);
-          const writable = await fileHandle.createWritable({ keepExistingData: true });
           
-          // Mover el cursor al final del archivo
-          await writable.seek(writable.length);
+          // Leer contenido actual del archivo
+          const file = await fileHandle.getFile();
+          const content = await file.text();
           
-          // Añadir nueva puntuación con fecha
-          const newEntry = `\n${new Date().toLocaleString()}: ${scores[team]}`;
-          await writable.write(newEntry);
+          // Preparar nuevo contenido
+          const lines = content.trim().split('\n');
+          lines.push(scores[team]);
+          const newContent = lines.join('\n');
+
+          // Escribir contenido actualizado
+          const writable = await fileHandle.createWritable();
+          await writable.write(newContent);
           await writable.close();
         } catch (error) {
           console.error(`Error guardando puntaje para ${team}:`, error);
@@ -76,6 +88,11 @@ function TeamScores() {
         >
           {teamFolder ? 'Carpeta Seleccionada' : 'Seleccionar Carpeta de Equipos'}
         </button>
+        {folderPath && (
+          <p className="mt-2 text-sm text-gray-600">
+            Carpeta seleccionada: {folderPath}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
