@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { NBAScorePredictor } from './utils/scorePredictor';
 import { FileUploader } from './components/FileUploader';
 import { validateScores } from './utils/fileHelpers';
-import ResultsLoader from './components/ResultsLoader';
 import TeamScores from './components/TeamScores';
 
 const predictorTeam1 = new NBAScorePredictor(5);
