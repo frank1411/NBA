@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { NBAScorePredictor } from './utils/scorePredictor';
 import { FileUploader } from './components/FileUploader';
 import { validateScores } from './utils/fileHelpers';
+import ResultsLoader from './components/ResultsLoader';
+import TeamScores from './components/TeamScores';
 
 const predictorTeam1 = new NBAScorePredictor(5);
 const predictorTeam2 = new NBAScorePredictor(5);
@@ -275,23 +278,38 @@ function App() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <h1 className="text-3xl font-bold text-center mb-8">Predictor de Puntuación NBA</h1>
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        <TeamPredictor 
-          predictor={predictorTeam1} 
-          defaultName="Equipo Local" 
-          otherTeamFactors={team2Factors}
-          onFactorChange={(factor, value) => setTeam2Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
-        />
-        <TeamPredictor 
-          predictor={predictorTeam2} 
-          defaultName="Equipo Visitante" 
-          otherTeamFactors={team1Factors}
-          onFactorChange={(factor, value) => setTeam1Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
-        />
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={
+          <div className="min-h-screen bg-gray-100 py-8 px-4">
+            <h1 className="text-3xl font-bold text-center mb-8">Predictor de Puntuación NBA</h1>
+            <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+              <TeamPredictor 
+                predictor={predictorTeam1} 
+                defaultName="Equipo Local" 
+                otherTeamFactors={team2Factors}
+                onFactorChange={(factor, value) => setTeam2Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
+              />
+              <TeamPredictor 
+                predictor={predictorTeam2} 
+                defaultName="Equipo Visitante" 
+                otherTeamFactors={team1Factors}
+                onFactorChange={(factor, value) => setTeam1Factors(prev => ({ ...prev, [factor]: !prev[factor] }))}
+              />
+            </div>
+            <div className="text-center mt-6">
+              <Link 
+                to="/team-scores" 
+                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+              >
+                Cargar Puntajes de Equipos
+              </Link>
+            </div>
+          </div>
+        } />
+        <Route path="/team-scores" element={<TeamScores />} />
+      </Routes>
+    </Router>
   );
 }
 
