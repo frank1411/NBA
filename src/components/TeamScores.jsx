@@ -23,11 +23,8 @@ function TeamScores() {
       const directoryHandle = await window.showDirectoryPicker();
       setTeamFolder(directoryHandle);
       
-      // Intentar obtener la ruta legible
-      if ('getAsFileSystemHandle' in directoryHandle) {
-        const path = await directoryHandle.getAsFileSystemHandle();
-        setFolderPath(path.name);
-      }
+      // Mostrar el nombre de la carpeta seleccionada
+      setFolderPath(directoryHandle.name);
     } catch (error) {
       console.error('Error seleccionando carpeta:', error);
       alert('Debes seleccionar una carpeta válida');
