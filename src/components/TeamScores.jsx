@@ -45,12 +45,8 @@ function TeamScores() {
       return 'LA Clippers_puntuaciones.txt';
     }
     
-    // Normalización genérica para otros equipos
-    return teamName
-      .toLowerCase()
-      .replace(/\s+/g, '_')      // Reemplazar espacios con guiones bajos
-      .replace(/[^a-z0-9_]/g, '') // Eliminar caracteres especiales
-      + '_puntuaciones.txt';
+    // Patrón original para los demás equipos
+    return teamName + '_puntuaciones.txt';
   };
 
   const handleSaveScores = async () => {
