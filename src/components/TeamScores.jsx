@@ -38,39 +38,83 @@ function TeamScores() {
     }));
   };
 
+  // Función para normalizar nombres de archivos
+  const normalizeFileName = (teamName) => {
+    // Caso especial para Clippers
+    if (teamName === 'Los Angeles Clippers') {
+      return 'LA Clippers_puntuaciones.txt';
+    }
+    
+    // Normalización genérica para otros equipos
+    return teamName
+      .toLowerCase()
+      .replace(/\s+/g, '_')      // Reemplazar espacios con guiones bajos
+      .replace(/[^a-z0-9_]/g, '') // Eliminar caracteres especiales
+      + '_puntuaciones.txt';
+  };
+
   const handleSaveScores = async () => {
     if (!teamFolder) {
       alert('Primero debes seleccionar una carpeta de equipos');
       return;
     }
 
+    let errorOccurred = false;
+
     for (const team of teams) {
       if (scores[team]) {
         try {
-          const fileName = `${team}_puntuaciones.txt`;
-          const fileHandle = await teamFolder.getFileHandle(fileName);
+          const fileName = normalizeFileName(team);
           
-          // Leer contenido actual del archivo
-          const file = await fileHandle.getFile();
-          const content = await file.text();
+          // Mostrar el nombre del archivo que se va a crear
+          console.log(`Intentando guardar archivo para ${team}: ${fileName}`);
+
+          let fileHandle;
+          
+          // Intentar crear o abrir el archivo
+          try {
+            fileHandle = await teamFolder.getFileHandle(fileName, { create: true });
+          } catch (error) {
+            console.error(`Error al manejar el archivo para ${team}:`, error);
+            errorOccurred = true;
+            continue;
+          }
+          
+          // Leer contenido actual del archivo (si existe)
+          let content = '';
+          try {
+            const file = await fileHandle.getFile();
+            content = await file.text();
+          } catch (readError) {
+            console.warn(`No se pudo leer el archivo para ${team}. Creando nuevo.`);
+          }
           
           // Preparar nuevo contenido
-          const lines = content.trim().split('\n');
+          const lines = content.trim() ? content.trim().split('\n') : [];
           lines.push(scores[team]);
           const newContent = lines.join('\n');
 
           // Escribir contenido actualizado
-          const writable = await fileHandle.createWritable();
-          await writable.write(newContent);
-          await writable.close();
+          try {
+            const writable = await fileHandle.createWritable();
+            await writable.write(newContent);
+            await writable.close();
+          } catch (writeError) {
+            console.error(`Error escribiendo en el archivo para ${team}:`, writeError);
+            errorOccurred = true;
+          }
         } catch (error) {
-          console.error(`Error guardando puntaje para ${team}:`, error);
-          alert(`No se pudo guardar el puntaje para ${team}`);
+          console.error(`Error general guardando puntaje para ${team}:`, error);
+          errorOccurred = true;
         }
       }
     }
 
-    alert('Puntajes guardados en archivos');
+    if (errorOccurred) {
+      alert('Algunos puntajes no se pudieron guardar. Revisa la consola para más detalles.');
+    } else {
+      alert('Puntajes guardados en archivos');
+    }
     setScores({});
   };
 
